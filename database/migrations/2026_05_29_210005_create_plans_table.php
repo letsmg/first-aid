@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('plans', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-$table->integer('urgent_requests_limit');
-$table->integer('app_requests_limit');
-$table->integer('presencial_requests_limit');
-$table->timestamps();
+            $table->integer('max_urgent_requests'); 
+            $table->integer('app_requests_limit');
+            $table->integer('presencial_requests_limit');
+            $table->timestamps();
         });
     }
 

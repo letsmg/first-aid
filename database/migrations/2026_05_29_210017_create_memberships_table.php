@@ -14,10 +14,11 @@ return new class extends Migration
         Schema::create('memberships', function (Blueprint $table) {
             $table->id();
             $table->foreignId('customer_id')->constrained();
-$table->foreignId('plan_id')->constrained();
-$table->date('expiration_date');
-$table->boolean('active')->default(true);
-$table->timestamps();
+            $table->foreignId('plan_id')->constrained();
+            $table->date('due_date'); // data de vencimento
+            $table->date('contract_date'); // data de contrato
+            $table->boolean('active')->default(true); // plano ativo
+            $table->timestamps();
         });
     }
 

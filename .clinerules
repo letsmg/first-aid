@@ -4,7 +4,7 @@ o projeto sera um sistema de gerenciamento de atendimentos remotos.
 # regras gerais
 1- o banco de dados usandos sera o postgresql
 
-2- o sistema usará principalmente laravel com react
+2- o sistema usará principalmente laravel + react + inertia para comunicação sem api e o tailwind para css responsivo inclusive nos menus
 
 3- deve haver politicas de privacidade e termos de uso 
     e o visitante deve ser obrigado a aceitar para usar o sistema
@@ -118,8 +118,7 @@ o projeto sera um sistema de gerenciamento de atendimentos remotos.
 2 - crie uma spa com: 
         link para o login ou cadastro
         link para serviços disponiveis 
-            (atendimento remoto, auxilio por telefone, visita tecnica, instalação de hardware)
-        deve ser responsivo usando tailwind com redimensionamento inclusive dos menus
+            (atendimento remoto, auxilio por telefone, visita tecnica, instalação de hardware)        
         deve haver uma área logada para os clientes e uma para o staff
 
 

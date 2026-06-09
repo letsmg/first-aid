@@ -14,10 +14,14 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-$table->string('email');
-$table->string('password')->hashingAlgorithm('argon2id');
-$table->enum('access_level', ['STAFF', '10', '11', 'CUSTOMERS', '20']);
-$table->timestamps();
+            $table->string('email')->unique();
+            $table->string('password');
+            // Níveis de acesso: STAFF (10-PADRÃO, 11-ADMIN), CUSTOMERS (20-CLIENTE)
+            $table->tinyInteger('access_level')->default(10); // 10: PADRÃO, 11: ADMIN, 20: CLIENTE
+>>>>+++ REPLACE
+
+            $table->timestamp('privacy_policy_accepted_at')->nullable();
+            $table->timestamps();
         });
     }
 
