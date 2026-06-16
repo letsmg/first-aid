@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notifiable;
 use App\Models\Membership;
 use App\Models\Customer; // Importando Customer
 
-#[Fillable(['name', 'email', 'password', 'nivel_de_acesso'])]
+#[Fillable(['name', 'email', 'password', 'access_level', 'privacy_policy_accepted_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -41,11 +41,17 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the membership associated with the user.
+     * Get the membership associated with the user's customer profile.
      */
     public function membership()
     {
-        // Assume que a chave estrangeira 'user_id' está na tabela memberships.
-        return $this->hasOne(Membership::class, 'user_id');
+        return $this->hasOneThrough(
+            Membership::class,
+            Customer::class,
+            'user_id', // Foreign key on customers table
+            'customer_id', // Foreign key on memberships table
+            'id', // Local key on users table
+            'id' // Local key on customers table
+        );
     }
 }

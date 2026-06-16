@@ -22,8 +22,7 @@ return new class extends Migration
             $table->foreignId('usuario_atendimento_id')->nullable()->constrained('users');
             $table->tinyInteger('status')->default(0); // 0: aguardando, 1: sendo atendido, 2: finalizado
             $table->tinyInteger('avaliacao')->nullable(); // 0: ruim, 1: boa, 2: ótima, 3: excelente
->>>>+++ REPLACE
-
+            $table->timestamps();
         });
     }
 

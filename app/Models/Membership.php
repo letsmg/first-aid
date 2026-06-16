@@ -16,7 +16,8 @@ class Membership extends Model
     protected $fillable = [
         'customer_id', 
         'plan_id', 
-        'expiration_date', 
+        'due_date',
+        'contract_date',
         'active'
     ];
 

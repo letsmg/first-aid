@@ -15,12 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            // Níveis de acesso: STAFF (10-PADRÃO, 11-ADMIN), CUSTOMERS (20-CLIENTE)
-            $table->tinyInteger('access_level')->default(10); // 10: PADRÃO, 11: ADMIN, 20: CLIENTE
->>>>+++ REPLACE
-
+            $table->tinyInteger('access_level')->default(10);
             $table->timestamp('privacy_policy_accepted_at')->nullable();
+            $table->rememberToken();
             $table->timestamps();
         });
     }

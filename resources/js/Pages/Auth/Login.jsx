@@ -1,10 +1,11 @@
-import Checkbox from '@/Components/Checkbox';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
+import InputLabel from '@/Components/InputLabel';
+import InputError from '@/Components/InputError';
+import PrimaryButton from '@/Components/PrimaryButton';
+import GuestLayout from '@/Layouts/GuestLayout';
+import FormFiller, { registerFormFiller } from '@/Components/FormFiller';
+import seedUsers from '@/Components/seedUsers';
 
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -13,9 +14,39 @@ export default function Login({ status, canResetPassword }) {
         remember: false,
     });
 
+    const [showPassword, setShowPassword] = useState(false);
+    const [showUsers, setShowUsers] = useState(false);
+    const [selectedUserId, setSelectedUserId] = useState(null);
+
+    // Registrar o FormFiller global para esta tela
+    useEffect(() => {
+        registerFormFiller({
+            fields: ['email', 'password'],
+            fillData: {
+                email: data.email || 'admin@firstaid.com',
+                password: data.password || 'password',
+            },
+        });
+        return () => {
+            delete window.fillForm;
+            delete window.clearForm;
+        };
+    }, []);
+
+    const togglePassword = () => {
+        const newState = !showPassword;
+        setShowPassword(newState);
+    };
+
+    const selectUser = (user) => {
+        setSelectedUserId(user.id);
+        setData('email', user.email);
+        setData('password', user.password);
+        setShowUsers(false);
+    };
+
     const submit = (e) => {
         e.preventDefault();
-
         post(route('login'), {
             onFinish: () => reset('password'),
         });
@@ -23,78 +54,149 @@ export default function Login({ status, canResetPassword }) {
 
     return (
         <GuestLayout>
-            <Head title="Log in" />
+            <Head title="Entrar" />
 
             {status && (
-                <div className="mb-4 text-sm font-medium text-green-600">
+                <div className="mb-4 rounded-lg bg-green-100 p-4 text-sm font-medium text-green-600">
                     {status}
                 </div>
             )}
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
+            <div className="mb-8 text-center">
+                <Link href="/" className="text-2xl font-bold text-blue-600">FirstAid</Link>
+                <h1 className="mt-4 text-xl font-semibold text-gray-900">Entrar</h1>
+                <p className="mt-1 text-sm text-gray-500">Acesse sua conta para continuar</p>
+            </div>
 
-                    <TextInput
+            <form onSubmit={submit} className="space-y-4">
+                <div>
+                    <InputLabel htmlFor="email" value="E-mail" />
+                    <input
                         id="email"
                         type="email"
                         name="email"
                         value={data.email}
-                        className="mt-1 block w-full"
+                        className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                         autoComplete="username"
-                        isFocused={true}
                         onChange={(e) => setData('email', e.target.value)}
+                        required
                     />
-
                     <InputError message={errors.email} className="mt-2" />
                 </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
-
+                <div>
+                    <InputLabel htmlFor="password" value="Senha" />
+                    <div className="relative mt-1">
+                        <input
+                            id="password"
+                            type={showPassword ? 'text' : 'password'}
+                            name="password"
+                            value={data.password}
+                            className="block w-full rounded-lg border-gray-300 pr-10 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            autoComplete="current-password"
+                            onChange={(e) => setData('password', e.target.value)}
+                            required
+                        />
+                        <button
+                            type="button"
+                            onClick={togglePassword}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            tabIndex={-1}
+                        >
+                            {showPassword ? (
+                                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                </svg>
+                            ) : (
+                                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            )}
+                        </button>
+                    </div>
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
-                <div className="mt-4 block">
-                    <label className="flex items-center">
-                        <Checkbox
-                            name="remember"
-                            checked={data.remember}
-                            onChange={(e) =>
-                                setData('remember', e.target.checked)
-                            }
-                        />
-                        <span className="ms-2 text-sm text-gray-600">
-                            Remember me
-                        </span>
-                    </label>
+                {/* Seletor de usuários pré-cadastrados */}
+                <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+                    <button
+                        type="button"
+                        onClick={() => setShowUsers(!showUsers)}
+                        className="flex w-full items-center justify-between text-sm font-medium text-gray-700"
+                    >
+                        <span>Usuários para teste</span>
+                        <svg className={`h-4 w-4 transition ${showUsers ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+
+                    {showUsers && (
+                        <div className="mt-2 space-y-1">
+                            <p className="text-xs text-gray-400">Clique em um usuário para preencher os campos:</p>
+                            {['Administrador', 'Suporte Técnico', 'Cliente'].map((role) => {
+                                const usersByRole = seedUsers.filter((u) => u.role === role);
+                                if (usersByRole.length === 0) return null;
+                                return (
+                                    <div key={role} className="mt-2">
+                                        <p className="mb-1 text-xs font-semibold uppercase text-gray-500">{role}</p>
+                                        {usersByRole.map((user) => (
+                                            <button
+                                                key={user.id}
+                                                type="button"
+                                                onClick={() => selectUser(user)}
+                                                className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition hover:bg-white ${
+                                                    selectedUserId === user.id ? 'bg-white ring-1 ring-blue-300' : ''
+                                                }`}
+                                            >
+                                                <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${user.badgeClass}`}>
+                                                    {user.role === 'Administrador' ? 'ADM' : user.role === 'Suporte Técnico' ? 'STF' : 'CLI'}
+                                                </span>
+                                                <span className="flex-1 font-medium text-gray-700">{user.name}</span>
+                                                <span className="text-xs text-gray-400">{user.email}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
+                <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-2">
+                        <input
+                            type="checkbox"
+                            name="remember"
+                            checked={data.remember}
+                            onChange={(e) => setData('remember', e.target.checked)}
+                            className="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-gray-600">Lembrar de mim</span>
+                    </label>
                     {canResetPassword && (
                         <Link
                             href={route('password.request')}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            className="text-sm text-blue-600 hover:text-blue-800"
                         >
-                            Forgot your password?
+                            Esqueceu a senha?
                         </Link>
                     )}
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
-                    </PrimaryButton>
                 </div>
+
+                <PrimaryButton className="w-full justify-center" disabled={processing}>
+                    Entrar
+                </PrimaryButton>
+
+                <p className="text-center text-sm text-gray-500">
+                    Não tem conta?{' '}
+                    <Link href={route('register')} className="font-medium text-blue-600 hover:text-blue-800">
+                        Cadastre-se
+                    </Link>
+                </p>
             </form>
+
+            <FormFiller />
         </GuestLayout>
     );
 }
